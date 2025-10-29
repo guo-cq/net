@@ -105,3 +105,9 @@ python3 train_DDPM.py --data_root augmented --split_file split_runs_custom/run_x
 
 4) DDPM 测试
 python3 test_DDPM.py --data_root augmented --split_file split_runs_custom/run_xxx/test.txt --checkpoint checkpoints/DDPM_run/epoch_200.pth --results_dir results/DDPM_run
+
+5) CycleGAN 训练（需要为两个域分别提供 split 文件，例如 `split/trainA.txt` 与 `split/trainB.txt`）
+python3 train_CycleGAN.py --data_root augmented --split_a split/trainA.txt --split_b split/trainB.txt --save_folder checkpoints/CycleGAN --log_dir tf-logs/CycleGAN
+
+6) CycleGAN 测试（分别指定 A→B 与 B→A 的生成器权重）
+python3 test_CycleGAN.py --data_root augmented --split_a split/testA.txt --split_b split/testB.txt --checkpoint_g_ab checkpoints/CycleGAN/netG_AB_epoch_200.pth --checkpoint_g_ba checkpoints/CycleGAN/netG_BA_epoch_200.pth --output_dir results/CycleGAN
