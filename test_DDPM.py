@@ -62,7 +62,11 @@ def compute_iou(pred, gt, threshold=0.5):
 
 def compute_rmse(pred, gt):
     mse = F.mse_loss(pred, gt, reduction="mean")
-    return torch.sqrt(mse)
+    return torch.sqrt(mse + 1e-8)
+
+
+def compute_l1(pred, gt):
+    return F.l1_loss(pred, gt, reduction="mean")
 
 
 def sample_from_model(model, cond, betas, alphas, alphas_cumprod):
@@ -152,6 +156,7 @@ def main():
 
     os.makedirs(args.results_dir, exist_ok=True)
 
+    total_l1 = 0.0
     total_ssim = 0.0
     total_iou = 0.0
     total_rmse = 0.0
@@ -167,11 +172,13 @@ def main():
             samples = sample_from_model(model, cond_norm, betas, alphas, alphas_cumprod)
             outputs = torch.clamp((samples + 1) / 2, 0, 1)
 
+            loss_l1 = compute_l1(outputs, target)
             loss_ssim = ssim_loss(outputs, target)
             batch_ssim = 1 - 2 * loss_ssim
             batch_iou = compute_iou(outputs, target)
             batch_rmse = compute_rmse(outputs, target)
 
+            total_l1 += loss_l1.item()
             total_ssim += batch_ssim.item()
             total_iou += batch_iou.item()
             total_rmse += batch_rmse.item()
@@ -182,11 +189,14 @@ def main():
                 utils.save_image(outputs[i], save_path, normalize=True)
                 sample_idx += 1
 
+    avg_l1 = total_l1 / max(1, num_batches)
     avg_ssim = total_ssim / max(1, num_batches)
     avg_iou = total_iou / max(1, num_batches)
     avg_rmse = total_rmse / max(1, num_batches)
 
-    print(f"Test Metrics: SSIM: {avg_ssim:.4f}, IoU: {avg_iou:.4f}, RMSE: {avg_rmse:.4f}")
+    print(
+        f"Test Metrics: L1: {avg_l1:.4f}, SSIM: {avg_ssim:.4f}, IoU: {avg_iou:.4f}, RMSE: {avg_rmse:.4f}"
+    )
 
 
 if __name__ == "__main__":
