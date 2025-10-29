@@ -109,7 +109,7 @@ def main():
     parser.add_argument("--width", type=int, default=256)
     parser.add_argument("--batch_size", type=int, default=8)
     parser.add_argument("--checkpoint", type=str, required=True)
-    parser.add_argument("--timesteps", type=int, default=1000, help="used when checkpoint does not store schedule")
+    parser.add_argument("--timesteps", type=int, default=100, help="used when checkpoint does not store schedule")
     parser.add_argument("--results_dir", type=str, default="results/DDPM")
     args = parser.parse_args()
 
