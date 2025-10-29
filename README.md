@@ -91,3 +91,23 @@ python3 test.py --data_root augmented --split_file split_runs_custom/run_2025102
 python3 scripts/run_custom_exps.py
 7) exp_runner.py — 更通用的实验调度（用于网格或自定义配置）
 python3 scripts/exp_runner.py --config <config.yaml>
+
+新增：CNN 与 DDPM 流程示例（保持与 UNet 相同的目录结构与 split 文件格式）
+
+1) CNN 训练
+python3 train_CNN.py --data_root augmented --split_file split_runs_custom/run_xxx/train.txt --save_folder checkpoints/CNN_run --log_dir tf-logs/CNN_run
+
+2) CNN 测试
+python3 test_CNN.py --data_root augmented --split_file split_runs_custom/run_xxx/test.txt --checkpoint checkpoints/CNN_run/epoch_100.pth --results_dir results/CNN_run
+
+3) DDPM 训练
+python3 train_DDPM.py --data_root augmented --split_file split_runs_custom/run_xxx/train.txt --save_folder checkpoints/DDPM_run --log_dir tf-logs/DDPM_run
+
+4) DDPM 测试
+python3 test_DDPM.py --data_root augmented --split_file split_runs_custom/run_xxx/test.txt --checkpoint checkpoints/DDPM_run/epoch_200.pth --results_dir results/DDPM_run
+
+5) CycleGAN 训练（需要为两个域分别提供 split 文件，例如 `split/trainA.txt` 与 `split/trainB.txt`）
+python3 train_CycleGAN.py --data_root augmented --split_a split/trainA.txt --split_b split/trainB.txt --save_folder checkpoints/CycleGAN --log_dir tf-logs/CycleGAN
+
+6) CycleGAN 测试（分别指定 A→B 与 B→A 的生成器权重）
+python3 test_CycleGAN.py --data_root augmented --split_a split/testA.txt --split_b split/testB.txt --checkpoint_g_ab checkpoints/CycleGAN/netG_AB_epoch_200.pth --checkpoint_g_ba checkpoints/CycleGAN/netG_BA_epoch_200.pth --output_dir results/CycleGAN
